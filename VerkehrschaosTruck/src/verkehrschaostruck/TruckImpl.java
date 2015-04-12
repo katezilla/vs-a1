@@ -6,148 +6,57 @@ import org.omg.CORBA.DomainManager;
 import org.omg.CORBA.ExceptionList;
 import org.omg.CORBA.NVList;
 import org.omg.CORBA.NamedValue;
+import org.omg.CORBA.ORB;
 import org.omg.CORBA.Object;
 import org.omg.CORBA.Policy;
 import org.omg.CORBA.Request;
 import org.omg.CORBA.SetOverrideType;
 
+import verkehrschaos.Truck;
 import verkehrschaos.TruckCompany;
 
-public class TruckImpl implements verkehrschaos.Truck {
+public class TruckImpl extends verkehrschaos.TruckPOA {
+	
+	private String name;
+	private TruckCompany company;
+	private double x;
+	private double y;
+	private boolean running = true;
+	
+	public void truckRun(ORB orb, Truck truck) {
+		company.addTruck(truck);
+		while (running) {
+			
+		}
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    /**
-     * generated serial ID
-     */
-    private static final long serialVersionUID = -4509971397324498165L;
+	@Override
+	public String getName() {
+		return name;
+	}
 
-    /**
-     * the name of the truck
-     */
-    private String name;
+	@Override
+	public TruckCompany getCompany() {
+		return company;
+	}
 
-    /**
-     * the current company the truck is at or is headed to
-     */
-    private TruckCompany company;
+	@Override
+	public void setCompany(TruckCompany company) {
+		this.company = company;
+	}
 
-    /**
-     * the x coordinate of the truck
-     */
-    private double x; // TODO: set public or create getter?
+	@Override
+	public void setCoordinate(double x, double y) {
+		this.x = x;
+		this.y = y;
+	}
 
-    /**
-     * the y coordinate of the truck
-     */
-    private double y; // TODO: set public or create getter?
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public TruckCompany getCompany() {
-        return company;
-    }
-
-    @Override
-    public void setCompany(TruckCompany company) {
-        if (company != null) {
-            this.company = company;
-        }
-    }
-
-    @Override
-    public void setCoordinate(double x, double y) {
-        // TODO: input check needed/useful?
-        this.x = x;
-        this.y = y;
-    }
-
-    @Override
-    public void putOutOfService() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public Request _create_request(Context arg0, String arg1, NVList arg2,
-            NamedValue arg3) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Request _create_request(Context arg0, String arg1, NVList arg2,
-            NamedValue arg3, ExceptionList arg4, ContextList arg5) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Object _duplicate() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public DomainManager[] _get_domain_managers() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Object _get_interface_def() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Policy _get_policy(int arg0) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public int _hash(int arg0) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public boolean _is_a(String arg0) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean _is_equivalent(Object arg0) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean _non_existent() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public void _release() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public Request _request(String arg0) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Object _set_policy_override(Policy[] arg0, SetOverrideType arg1) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
+	@Override
+	public void putOutOfService() {
+		running = false;
+	}
 }

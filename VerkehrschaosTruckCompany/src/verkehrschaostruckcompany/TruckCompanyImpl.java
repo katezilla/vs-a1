@@ -8,154 +8,114 @@ import org.omg.CORBA.DomainManager;
 import org.omg.CORBA.ExceptionList;
 import org.omg.CORBA.NVList;
 import org.omg.CORBA.NamedValue;
+import org.omg.CORBA.ORB;
 import org.omg.CORBA.Object;
 import org.omg.CORBA.Policy;
 import org.omg.CORBA.Request;
 import org.omg.CORBA.SetOverrideType;
+import org.omg.CORBA.ORBPackage.InvalidName;
+import org.omg.CosNaming.NamingContextExt;
+import org.omg.CosNaming.NamingContextExtHelper;
 
+import verkehrschaos.ELocationNotFound;
+import verkehrschaos.Streets;
+import verkehrschaos.StreetsHelper;
 import verkehrschaos.TTruckListHolder;
 import verkehrschaos.Truck;
 import verkehrschaos.TruckCompany;
+import verkehrschaos.TruckCompanyHelper;
+import verkehrschaos.TruckCompanyPOA;
 
-public class TruckCompanyImpl implements TruckCompany {
+public class TruckCompanyImpl extends TruckCompanyPOA {
+	
+	public void set_name(String name) {
+		this.name = name;		
+	}
+	
+	public void run(ORB orb, TruckCompany compy, String slot) {
+		Streets streets = null;
+		_comp = compy;
+		try {
+			NamingContextExt nc = NamingContextExtHelper.narrow(
+			        orb.resolve_initial_references("NameService"));
+			org.omg.CORBA.Object obj = nc.resolve_str("Streets");
+			streets = StreetsHelper.narrow(obj);
+			System.out.println("slot: " + slot);
+			streets.claim(compy, slot);
+			while(running) {
+				// Todo: Zu condition variable oder semaphore machen.
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (streets != null) {
+				try {
+					streets.free(slot);
+				} catch (ELocationNotFound e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 
-    /**
-     * generated serial ID
-     */
-    private static final long serialVersionUID = 7602071591051678920L;
-
-    /**
-     * the name of the truck company
-     */
     private String name;
+    private ArrayList<Truck> truckList = new ArrayList<Truck>();
+    private ArrayList<Truck> truckIsOnTheWay = new ArrayList<Truck>();
+    private volatile boolean running = true;
+    
+    private TruckCompany _comp;
+    
+    int trucki = 0;
+	@Override
+	public String getName() {
+		return name;
+	}
 
-    private ArrayList<Truck> truckList;
+	@Override
+	public void addTruck(Truck truck) {
+		truckList.add(truck);
+		System.out.println("addtruck");
+	}
 
-    @Override
-    public String getName() {
-        return name;
-    }
+	@Override
+	public void removeTruck(Truck truck) {
+        truckList.remove(truck);
+        System.out.println("removeTruck");
+	}
 
-    @Override
-    public void addTruck(Truck truck) {
-        if (truck != null) {
-            truckList.add(truck);
-        }
-    }
+	@Override
+	public int getTrucks(TTruckListHolder trucks) {
+		for (Truck t : truckList) {
+			System.out.println("Truck: " + t.getName());
+		}
+		System.out.println("Truck list is: " + truckList.size());
+		trucks.value = new Truck[truckList.size()];
+		if (truckList != null && !truckList.isEmpty()) {
+			truckList.toArray(trucks.value);
+		}
+        return truckList != null ? truckList.size() : 0;
+	}
 
-    @Override
-    public void removeTruck(Truck truck) {
-        if (truck != null) {
-            truckList.remove(truck);
-        }
-    }
+	@Override
+	public void leave(Truck truck) {
+        truckList.remove(truck);
+	}
 
-    @Override
-    public int getTrucks(TTruckListHolder trucks) {
-        trucks.value = truckList.toArray(trucks.value); // TODO: correct usage
-                                                        // of toArray?
-        return truckList.size();
-    }
+	@Override
+	public void advise(Truck truck) {
+		truckIsOnTheWay.add(truck);
+		truckList.add(truck);
+		truck.setCompany(_comp);
+	}
 
-    @Override
-    public void leave(Truck truck) {
-        this.removeTruck(truck); // TODO: check if actually same behaviour
-    }
+	@Override
+	public void arrive(Truck truck) {
+		truckIsOnTheWay.remove(truck);	
+	}
 
-    @Override
-    public void advise(Truck truck) {
-        this.addTruck(truck);
-        truck.setCompany(this);
-    }
-
-    @Override
-    public void arrive(Truck truck) {
-        // TODO: what behaviour needed?
-    }
-
-    @Override
-    public void putOutOfService() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public Request _create_request(Context arg0, String arg1, NVList arg2,
-            NamedValue arg3) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Request _create_request(Context arg0, String arg1, NVList arg2,
-            NamedValue arg3, ExceptionList arg4, ContextList arg5) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Object _duplicate() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public DomainManager[] _get_domain_managers() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Object _get_interface_def() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Policy _get_policy(int arg0) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public int _hash(int arg0) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public boolean _is_a(String arg0) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean _is_equivalent(Object arg0) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean _non_existent() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public void _release() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public Request _request(String arg0) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Object _set_policy_override(Policy[] arg0, SetOverrideType arg1) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
+	@Override
+	public void putOutOfService() {
+		running = false;
+	}
 }
