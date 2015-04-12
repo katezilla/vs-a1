@@ -21,13 +21,14 @@ public class TruckImpl extends verkehrschaos.TruckPOA {
 	private TruckCompany company;
 	private double x;
 	private double y;
-	private boolean running = true;
+	private volatile boolean running = true;
 	
 	public void truckRun(ORB orb, Truck truck) {
 		company.addTruck(truck);
 		while (running) {
 			
 		}
+		company.removeTruck(truck);
 	}
 	
 	public void setName(String name) {

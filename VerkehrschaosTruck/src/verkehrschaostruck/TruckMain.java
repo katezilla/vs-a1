@@ -52,9 +52,13 @@ public class TruckMain {
 
 			System.out.println("nameing");
 			truck.truckRun(orb, TruckHelper.narrow(nc.resolve_str(name)));
+			nc.unbind(path);
+			orb.shutdown(true);
+			
 
 		} catch (Exception e) {
 			System.err.println("Error: " + e);
 		}
+		System.out.println("truck destroring");
 	}
 }

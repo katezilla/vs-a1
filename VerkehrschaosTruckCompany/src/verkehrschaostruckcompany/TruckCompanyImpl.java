@@ -80,7 +80,9 @@ public class TruckCompanyImpl extends TruckCompanyPOA {
 
 	@Override
 	public void removeTruck(Truck truck) {
-        truckList.remove(truck);
+        if (truckList.contains(truck)) {
+        	truckList.remove(truck);
+        }
         System.out.println("removeTruck");
 	}
 
@@ -116,6 +118,11 @@ public class TruckCompanyImpl extends TruckCompanyPOA {
 
 	@Override
 	public void putOutOfService() {
-		running = false;
+        running = false;
+        for (Truck t : truckIsOnTheWay) {
+        	t.putOutOfService();
+        }
+        truckIsOnTheWay.clear();
+        truckList.clear();
 	}
 }

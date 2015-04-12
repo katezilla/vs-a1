@@ -59,6 +59,7 @@ public class CompanyMain {
 			System.out.println("Company ready and waiting...");
 			
 			company.run(orb, href, slot);
+			ncRef.unbind(path);
 			
 		} catch (Exception e) {
 			System.err.println("Error: " + e);			
