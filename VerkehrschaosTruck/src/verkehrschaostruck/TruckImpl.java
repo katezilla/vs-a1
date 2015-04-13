@@ -1,63 +1,64 @@
 package verkehrschaostruck;
 
-import org.omg.CORBA.Context;
-import org.omg.CORBA.ContextList;
-import org.omg.CORBA.DomainManager;
-import org.omg.CORBA.ExceptionList;
-import org.omg.CORBA.NVList;
-import org.omg.CORBA.NamedValue;
+import java.util.concurrent.Semaphore;
+
 import org.omg.CORBA.ORB;
-import org.omg.CORBA.Object;
-import org.omg.CORBA.Policy;
-import org.omg.CORBA.Request;
-import org.omg.CORBA.SetOverrideType;
 
 import verkehrschaos.Truck;
 import verkehrschaos.TruckCompany;
 
 public class TruckImpl extends verkehrschaos.TruckPOA {
-	
-	private String name;
-	private TruckCompany company;
-	private double x;
-	private double y;
-	private volatile boolean running = true;
-	
-	public void truckRun(ORB orb, Truck truck) {
-		company.addTruck(truck);
-		while (running) {
-			
-		}
-		company.removeTruck(truck);
-	}
-	
-	public void setName(String name) {
-		this.name = name;
-	}
 
-	@Override
-	public String getName() {
-		return name;
-	}
+    private volatile boolean running = true;
+    private Semaphore sema = new Semaphore(0);
 
-	@Override
-	public TruckCompany getCompany() {
-		return company;
-	}
+    private String name;
+    private TruckCompany company;
+    @SuppressWarnings("unused")
+    private double x;
+    @SuppressWarnings("unused")
+    private double y;
 
-	@Override
-	public void setCompany(TruckCompany company) {
-		this.company = company;
-	}
+    public void truckRun(ORB orb, Truck truck) {
+        company.addTruck(truck);
+        try {
+            while (running) {
+                sema.acquire();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        company.removeTruck(truck);
+    }
 
-	@Override
-	public void setCoordinate(double x, double y) {
-		this.x = x;
-		this.y = y;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	@Override
-	public void putOutOfService() {
-		running = false;
-	}
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public TruckCompany getCompany() {
+        return company;
+    }
+
+    @Override
+    public void setCompany(TruckCompany company) {
+        this.company = company;
+    }
+
+    @Override
+    public void setCoordinate(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    @Override
+    public void putOutOfService() {
+        running = false;
+        sema.release();
+    }
 }
