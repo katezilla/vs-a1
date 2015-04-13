@@ -1,5 +1,12 @@
 package verkehrschaostruckcompany;
 
+/**
+ * Praktikum VSP (Prof. Heitmann), SS 15
+ * Gruppe: Iacobi, Jannik      | Matrikelnr: 2144481 | jannik.iacobi@haw-hamburg.de 
+ *         Kirstein, Katja     | Matrikelnr: 2125137 | katja.kirstein@haw-hamburg.de 
+ * Aufgabe 1: Verkehrschaos
+ */
+
 import java.util.ArrayList;
 import java.util.concurrent.Semaphore;
 
@@ -17,25 +24,35 @@ import verkehrschaos.TruckCompanyPOA;
 
 public class TruckCompanyImpl extends TruckCompanyPOA {
 
-    private String name;
-    private ArrayList<Truck> truckList = new ArrayList<Truck>();
-    private ArrayList<Truck> truckIsOnTheWay = new ArrayList<Truck>();
+    /**
+     * process variables
+     */
     private volatile boolean running = true;
     private Semaphore sema = new Semaphore(0);
 
+    /**
+     * information variables
+     */
+    private String name;
+    private ArrayList<Truck> truckList = new ArrayList<Truck>();
+    private ArrayList<Truck> truckIsOnTheWay = new ArrayList<Truck>();
     private TruckCompany _comp;
 
-    // unused?
-    // int trucki = 0;
-
-    public void set_name(String name) {
-        this.name = name;
-    }
-
+    /**
+     * start the truck company
+     * 
+     * @param orb
+     *            - the CORBA.ORB object
+     * @param compy
+     *            - the own company
+     * @param slot
+     *            - the slot that should be used
+     */
     public void run(ORB orb, TruckCompany compy, String slot) {
         Streets streets = null;
         _comp = compy;
         try {
+            // claim the user given slot
             NamingContextExt nc = NamingContextExtHelper.narrow(orb
                     .resolve_initial_references("NameService"));
             org.omg.CORBA.Object obj = nc.resolve_str("Streets");
@@ -56,6 +73,10 @@ public class TruckCompanyImpl extends TruckCompanyPOA {
                 }
             }
         }
+    }
+
+    public void set_name(String name) {
+        this.name = name;
     }
 
     @Override

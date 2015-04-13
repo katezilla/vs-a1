@@ -1,12 +1,17 @@
 package verkehrschaostruckcompany;
 
+/**
+ * Praktikum VSP (Prof. Heitmann), SS 15
+ * Gruppe: Iacobi, Jannik      | Matrikelnr: 2144481 | jannik.iacobi@haw-hamburg.de 
+ *         Kirstein, Katja     | Matrikelnr: 2125137 | katja.kirstein@haw-hamburg.de 
+ * Aufgabe 1: Verkehrschaos
+ */
+
 import java.util.*;
 
-import org.omg.CORBA.ORBPackage.InvalidName;
 import org.omg.CORBA.ORB;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
-import org.omg.PortableServer.POAManagerPackage.AdapterInactive;
 import org.omg.CosNaming.*;
 
 import verkehrschaos.*;
@@ -14,27 +19,34 @@ import verkehrschaos.*;
 public class CompanyMain {
 
     /**
+     * TruckCompany program entry
+     * 
      * @param args
-     * @throws InvalidName
-     * @throws AdapterInactive
+     *            - the --name=COMPANY_NAME and the --slot=SLOT as well as the
+     *            --nameserverport=20000 and the --nameserverhost=lab24
      */
     public static void main(String[] args) {
         try {
-            Properties props = new Properties();
-            props.put("org.omg.CORBA.ORBInitialPort", "20000");
-            props.put("org.omg.CORBA.ORBInitialHost", "localhost");
-            ORB orb = ORB.init(args, props);
 
             String name = "";
             String slot = "";
+            String nsPort = "20000";
+            String nsHost = "localhost";
             for (int i = 0; i < args.length; ++i) {
                 if (args[i].contains("--name=")) {
                     name = args[i].split("=")[1];
-                }
-                if (args[i].contains("--slot=")) {
+                } else if (args[i].contains("--slot=")) {
                     slot = args[i].split("=")[1];
+                } else if (args[i].contains("--nameserverport=")) {
+                    nsPort = args[i].split("=")[1];
+                } else if (args[i].contains("--nameserverhost=")) {
+                    nsHost = args[i].split("=")[1];
                 }
             }
+            Properties props = new Properties();
+            props.put("org.omg.CORBA.ORBInitialPort", nsPort);
+            props.put("org.omg.CORBA.ORBInitialHost", nsHost);
+            ORB orb = ORB.init(args, props);
 
             POA rootPoa = POAHelper.narrow(orb
                     .resolve_initial_references("RootPOA"));

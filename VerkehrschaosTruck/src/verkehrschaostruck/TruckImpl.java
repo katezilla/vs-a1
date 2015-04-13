@@ -1,5 +1,12 @@
 package verkehrschaostruck;
 
+/**
+ * Praktikum VSP (Prof. Heitmann), SS 15
+ * Gruppe: Iacobi, Jannik      | Matrikelnr: 2144481 | jannik.iacobi@haw-hamburg.de 
+ *         Kirstein, Katja     | Matrikelnr: 2125137 | katja.kirstein@haw-hamburg.de 
+ * Aufgabe 1: Verkehrschaos
+ */
+
 import java.util.concurrent.Semaphore;
 
 import org.omg.CORBA.ORB;
@@ -9,9 +16,15 @@ import verkehrschaos.TruckCompany;
 
 public class TruckImpl extends verkehrschaos.TruckPOA {
 
+    /**
+     * process variables
+     */
     private volatile boolean running = true;
     private Semaphore sema = new Semaphore(0);
 
+    /**
+     * information variables
+     */
     private String name;
     private TruckCompany company;
     @SuppressWarnings("unused")
@@ -19,6 +32,14 @@ public class TruckImpl extends verkehrschaos.TruckPOA {
     @SuppressWarnings("unused")
     private double y;
 
+    /**
+     * start the truck
+     * 
+     * @param orb
+     *            - the CORBA.ORB object
+     * @param truck
+     *            - the own truck
+     */
     public void truckRun(ORB orb, Truck truck) {
         company.addTruck(truck);
         try {
