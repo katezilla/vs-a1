@@ -113,6 +113,7 @@ public class TruckCompanyImpl extends TruckCompanyPOA {
 
     @Override
     public void leave(Truck truck) {
+        // TODO: throw error if truck is still on the way
         truckList.remove(truck);
     }
 

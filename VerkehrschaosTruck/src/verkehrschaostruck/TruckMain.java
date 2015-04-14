@@ -71,10 +71,10 @@ public class TruckMain {
             truck.truckRun(orb, TruckHelper.narrow(nc.resolve_str(name)));
             nc.unbind(path);
             orb.shutdown(true);
-
+            Thread.sleep(500);
         } catch (Exception e) {
             System.err.println("Error: " + e);
         }
-        System.out.println("truck destroring");
+        System.out.println("Truck destroyed");
     }
 }
