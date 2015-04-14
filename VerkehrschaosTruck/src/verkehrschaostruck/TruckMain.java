@@ -21,60 +21,70 @@ import verkehrschaos.TruckHelper;
 
 public class TruckMain {
 
-    /**
-     * Truck program entry
-     * 
-     * @param args
-     *            - the --name=COMPANY_NAME and the --company=COMPANY_NAME as
-     *            well as the --nameserverport=20000 and the
-     *            --nameserverhost=lab24
-     */
-    public static void main(String[] args) {
-        try {
-            String name = "";
-            String company = "";
-            String nsPort = "20000";
-            String nsHost = "localhost";
-            for (int i = 0; i < args.length; ++i) {
-                if (args[i].contains("--name=")) {
-                    name = args[i].split("=")[1];
-                } else if (args[i].contains("--company=")) {
-                    company = args[i].split("=")[1];
-                } else if (args[i].contains("--nameserverport=")) {
-                    nsPort = args[i].split("=")[1];
-                } else if (args[i].contains("--nameserverhost=")) {
-                    nsHost = args[i].split("=")[1];
-                }
-            }
+	/**
+	 * Truck program entry, set up corba connections
+	 * 
+	 * @param args
+	 *            - the --name=COMPANY_NAME and the --company=COMPANY_NAME as
+	 *            well as the --nameserverport=20000 and the
+	 *            --nameserverhost=lab24
+	 */
+	public static void main(String[] args) {
+		try {
+			String name = "";
+			String company = "";
+			String nsPort = "20000";
+			String nsHost = "localhost";
+			for (int i = 0; i < args.length; ++i) {
+				if (args[i].contains("--name=")) {
+					name = args[i].split("=")[1];
+				} else if (args[i].contains("--company=")) {
+					company = args[i].split("=")[1];
+				} else if (args[i].contains("--nameserverport=")) {
+					nsPort = args[i].split("=")[1];
+				} else if (args[i].contains("--nameserverhost=")) {
+					nsHost = args[i].split("=")[1];
+				}
+			}
 
-            Properties props = new Properties();
-            props.put("org.omg.CORBA.ORBInitialPort", nsPort);
-            props.put("org.omg.CORBA.ORBInitialHost", nsHost);
-            ORB orb = ORB.init(args, props);
+			Properties props = new Properties();
+			props.put("org.omg.CORBA.ORBInitialPort", nsPort);
+			props.put("org.omg.CORBA.ORBInitialHost", nsHost);
+			ORB orb = ORB.init(args, props);
 
-            POA rootPoa = POAHelper.narrow(orb
-                    .resolve_initial_references("RootPOA"));
-            rootPoa.the_POAManager().activate();
+			POA rootPoa = POAHelper.narrow(orb
+					.resolve_initial_references("RootPOA"));
+			rootPoa.the_POAManager().activate();
 
-            NamingContextExt nc = NamingContextExtHelper.narrow(orb
-                    .resolve_initial_references("NameService"));
+			NamingContextExt nc = NamingContextExtHelper.narrow(orb
+					.resolve_initial_references("NameService"));
 
-            TruckImpl truck = new TruckImpl();
-            truck.setName(name);
-            truck.setCompany(TruckCompanyHelper.narrow(nc.resolve_str(company)));
-            org.omg.CORBA.Object ref = rootPoa.servant_to_reference(truck);
+			TruckImpl truck = new TruckImpl();
+			truck.setName(name);
+			truck.setCompany(TruckCompanyHelper.narrow(nc.resolve_str(company)));
+			org.omg.CORBA.Object ref = rootPoa.servant_to_reference(truck);
 
-            NameComponent path[] = nc.to_name(name);
-            nc.rebind(path, ref);
+			try {
+				nc.resolve_str(name);
+				// if no Exception is thrown, the name is already used
+				throw new InvalidInputException("Name already used");
+			} catch (org.omg.CosNaming.NamingContextPackage.NotFound e) {
+				// no object found, so name is not in use
+			}
+			
+			NameComponent path[] = nc.to_name(name);
+			nc.rebind(path, ref);
 
-            System.out.println("naming");
-            truck.truckRun(orb, TruckHelper.narrow(nc.resolve_str(name)));
-            nc.unbind(path);
-            orb.shutdown(true);
-            Thread.sleep(500);
-        } catch (Exception e) {
-            System.err.println("Error: " + e);
-        }
-        System.out.println("Truck destroyed");
-    }
+			System.out.println("Truck running");
+			truck.run(orb, TruckHelper.narrow(nc.resolve_str(name)));
+
+			nc.unbind(path);
+			orb.shutdown(true);
+			Thread.sleep(500);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println("Truck destroyed");
+	}
 }

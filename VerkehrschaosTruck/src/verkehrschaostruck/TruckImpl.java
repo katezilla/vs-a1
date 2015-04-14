@@ -40,7 +40,7 @@ public class TruckImpl extends verkehrschaos.TruckPOA {
      * @param truck
      *            - the own truck
      */
-    public void truckRun(ORB orb, Truck truck) {
+    public void run(ORB orb, Truck truck) {
         company.addTruck(truck);
         try {
             while (running) {
