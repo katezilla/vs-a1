@@ -1,0 +1,8 @@
+"C:\Program Files\Java\jdk1.8.0_31\bin\orbd"  -ORBInitialPort 20000
+java -jar Verkehrschaos.jar name=Streets nameserverport=20000 nameserverhost=localhost
+java -jar VerkehrschaosControl.jar name=Streets nameserverport=20000 nameserverhost=localhost
+
+--name=a --slot=ost --nameserverport=20000 --nameserverhost=localhost
+--name=b --slot=west --nameserverport=20000 --nameserverhost=localhost
+--name=1 --company=a --nameserverport=20000 --nameserverhost=localhost
+--name=2 --company=a --nameserverport=20000 --nameserverhost=localhost
