@@ -144,7 +144,7 @@ public class TruckCompanyImpl extends TruckCompanyPOA {
 	}
 
 	@Override
-	public synchronized void putOutOfService() {
+	public void putOutOfService() {
 		running = false;
 		for (int i = truckIsOnTheWay.size() - 1; i >= 0; i--) {
 			truckIsOnTheWay.get(i).putOutOfService();
