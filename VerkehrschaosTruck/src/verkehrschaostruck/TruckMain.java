@@ -79,6 +79,7 @@ public class TruckMain {
 			truck.run(orb, TruckHelper.narrow(nc.resolve_str(name)));
 
 			nc.unbind(path);
+			Thread.sleep(500);
 			orb.shutdown(true);
 			Thread.sleep(500);
 

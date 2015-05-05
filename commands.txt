@@ -6,3 +6,14 @@ java -jar VerkehrschaosControl.jar name=Streets nameserverport=20000 nameserverh
 --name=b --slot=west --nameserverport=20000 --nameserverhost=localhost
 --name=1 --company=a --nameserverport=20000 --nameserverhost=localhost
 --name=2 --company=a --nameserverport=20000 --nameserverhost=localhost
+
+
+ssh-keygen ~/.ssh
+cp ~/.ssh/id_rsa.pub ~/.ssh/authorized_keys
+ssh lab27
+
+cd ~/git/vs-a1/VerkehrschaosTruck/bin
+for (( i=0;i<=10;i=i+1)); do java verkehrschaostruck/TruckMain --name=kirsche$i --company=torte2 --nameserverport=5000 --nameserverhost=lab22 & done
+
+cd ~/git/vs-a1/VerkehrschaosTruckCompany/bin
+java verkehrschaostruckcompany/CompanyMain --name=torte2 --slot=nord --streetsname=hh --nameserverport=5000 --nameserverhost=lab22

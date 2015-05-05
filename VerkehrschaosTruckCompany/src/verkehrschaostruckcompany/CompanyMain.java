@@ -81,6 +81,7 @@ public class CompanyMain {
 			company.run(orb, href, slot, streetsname);
 
 			ncRef.unbind(path);
+			Thread.sleep(500);
 			orb.shutdown(true);
 			Thread.sleep(500);
 
